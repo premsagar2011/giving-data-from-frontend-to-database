@@ -1,0 +1,77 @@
+package com.front_to_jdbc;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/Rigester")
+public class Front_To_JDBC extends HttpServlet 
+{
+	private static final long serialVersionUID = 1L;
+    
+    public Front_To_JDBC() 
+    {
+        super();
+       
+    }
+    
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	{
+		response.setContentType("text/html");
+		PrintWriter pw=response.getWriter();
+		String name=request.getParameter("student");
+		String mail=request.getParameter("mail");
+		
+		String url="jdbc:mysql://localhost:3306/palle";
+		String user="root";
+		String pass="BUNNYprem@1610";
+		String insert="insert into student(name,mail) values(?,?)";
+		PreparedStatement ps=null;
+		Connection con=null;
+		try 
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			con=DriverManager.getConnection(url, user, pass);
+			ps=con.prepareStatement(insert);
+			ps.setString(1, name);
+			ps.setString(2, mail);
+			int count=ps.executeUpdate();
+			if(count>0)
+			{
+				pw.print("<h1> thank you for the registration<h1>");
+			}
+		} 
+		catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		} catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		finally 
+		{
+			try {
+				ps.close();
+				con.close();
+			} catch (SQLException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	{
+		doGet(request, response);
+	}
+
+}
